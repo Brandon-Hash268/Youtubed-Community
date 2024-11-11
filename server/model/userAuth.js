@@ -1,4 +1,5 @@
 const { database } = require("../config/mongodb");
+const bcrypt = require("bcrypt");
 
 class UserAuth {
   static async findUser({ username, email }) {
@@ -9,18 +10,24 @@ class UserAuth {
   }
 
   static async register({ name, username, email, password }) {
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPass = bcrypt.hashSync(password, salt);
+
     const user = await database
       .collection("Users")
-      .insertOne({ name, username, email, password });
+      .insertOne({ name, username, email, password:hashedPass });
     return user;
   }
 
   static async login({ email, password }) {
     const { byUserEmail: user } = await this.findUser({ email });
-    if (user.password !== password) {
-      return null;
-    }
+    
+    const isValid = bcrypt.compareSync(password, user.password);
 
+    if (!isValid) {
+      return null
+    }
+    
     return user;
   }
 

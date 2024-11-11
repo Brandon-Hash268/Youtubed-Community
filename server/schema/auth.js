@@ -60,7 +60,7 @@ const resolversUser = {
     register: async (_, args) => {
       const { name, username, email, password } = args;
       console.log(name);
-
+      
       if (!username) {
         throw new Error("Username is required");
       }
@@ -85,7 +85,12 @@ const resolversUser = {
         throw new Error("User with that email already exist");
       }
 
-      const user = await UserAuth.register({ name, username, email, password });
+      const user = await UserAuth.register({
+        name,
+        username,
+        email,
+        password: hashedPass,
+      });
       //   console.log(user);
 
       return user;
