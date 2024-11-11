@@ -53,14 +53,14 @@ const resolversUser = {
 
       const access_token = signToken({ userId: user._id });
       console.log(access_token);
-      
-      return { access_token,user };
+
+      return { access_token, user };
     },
 
     register: async (_, args) => {
       const { name, username, email, password } = args;
       console.log(name);
-      
+
       if (!username) {
         throw new Error("Username is required");
       }
@@ -85,13 +85,13 @@ const resolversUser = {
         throw new Error("User with that email already exist");
       }
 
-      const user = await UserAuth.register({
+      const { insertedId } = await UserAuth.register({
         name,
         username,
         email,
-        password: hashedPass,
+        password,
       });
-      //   console.log(user);
+      const user = UserAuth.findUserById({ id: insertedId });
 
       return user;
     },
