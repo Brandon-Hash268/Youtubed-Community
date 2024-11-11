@@ -1,3 +1,4 @@
+const { signToken } = require("../helpers/jwt");
 const UserAuth = require("../model/userAuth");
 
 const typeDefsUser = `#graphql
@@ -8,12 +9,17 @@ const typeDefsUser = `#graphql
         email:String
     }
 
+    type Token{
+        access_token:String
+        user:User
+    }
+
     type Query{
         searchUser(username:String):[User]
     }
 
     type Mutation{
-        login(email:String!,password:String!):User
+        login(email:String!,password:String!):Token
         register(name:String,username:String!,email:String!,password:String!):User
     }
 `;
@@ -43,9 +49,14 @@ const resolversUser = {
       if (!user) {
         throw new Error("Invalid Email or Password");
       }
+      console.log(user);
 
-      return user;
+      const access_token = signToken({ userId: user._id });
+      console.log(access_token);
+      
+      return { access_token,user };
     },
+
     register: async (_, args) => {
       const { name, username, email, password } = args;
       console.log(name);
