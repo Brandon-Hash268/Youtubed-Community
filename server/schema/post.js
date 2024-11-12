@@ -37,6 +37,7 @@ const typeDefsPost = `#graphql
     addPost(content: String!
     tags: [String]
     imgUrl: String): Post
+    addComment(content:String!,postId:ID!):Comment
   }
 `;
 
@@ -48,11 +49,11 @@ const resolversPost = {
       const posts = await Post.allPost();
       return posts;
     },
-    getPostById: async (_,args, context) => {
+    getPostById: async (_, args, context) => {
       context.authentication();
-      const {id} = args
+      const { id } = args;
 
-      const post = await Post.findById({id});
+      const post = await Post.findById({ id });
       return post;
     },
   },
@@ -76,6 +77,21 @@ const resolversPost = {
 
       const post = await Post.findById({ id: insertedId });
       return post;
+    },
+
+    addComment: async (_, args, context) => {
+        console.log(context.authentication());
+        
+      const { username } = context.authentication();
+      const { content, postId } = args;
+      if (!content) {
+        throw new Error("Content is required")
+      }
+      const createdAt= new Date()
+      const updatedAt= new Date()
+
+      await Post.addComment({ postId, content, username,createdAt,updatedAt });
+      return {content:content,username:username,createdAt,updatedAt};
     },
   },
 };

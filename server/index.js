@@ -30,7 +30,7 @@ async function startServer() {
           }
 
           const user = verifyToken(token);
-          console.log(user);
+          // console.log(user);
           
           return user;
         },

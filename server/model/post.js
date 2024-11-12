@@ -32,5 +32,23 @@ class Post {
 
     return post;
   }
+
+  static async addComment({ content, username, postId, createdAt, updatedAt }) {
+    const newComment = {
+      content: content,
+      username: username,
+      createdAt,
+      updatedAt,
+    };
+    const comment = await database
+      .collection("Posts")
+      .updateOne(
+        { _id: new ObjectId(String(postId)) },
+        { $push: { comments: newComment } }
+      );
+    // console.log(comment, "<<<<<<<<<<");
+
+    return comment;
+  }
 }
 module.exports = { Post };

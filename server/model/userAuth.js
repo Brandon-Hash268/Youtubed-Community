@@ -30,8 +30,9 @@ class UserAuth {
     if (!isValid) {
       throw new Error("Invalid Email or Password");
     }
-
-    const access_token = signToken({ userId: user._id });
+    // console.log(user);
+    
+    const access_token = signToken({ userId: user._id,username:user.username });
     return access_token;
   }
 
