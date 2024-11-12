@@ -1,93 +1,34 @@
-const { signToken } = require("../helpers/jwt");
-const UserAuth = require("../model/userAuth");
+// follow.js
+const { FollowUser } = require("../model/follow");
 
 const typeDefsFollow = `#graphql
-    type User{
-        _id:ID
-        name:String
-        username:String
-        email:String
-    }
+  type Follow {
+    _id: ID!
+    followingId: ID!
+    followerId: ID!
+    createdAt: String
+    updatedAt: String
+  }
 
-    type Token{
-        access_token:String
-    }
-
-    type Query{
-        searchUser(username:String):[User]
-    }
-
-    type Mutation{
-        login(email:String!,password:String!):Token
-        register(name:String,username:String!,email:String!,password:String!):User
-    }
+  type Mutation {
+    follow(followingId: ID!): Follow
+  }
 `;
 
 const resolversFollow = {
-  Query: {
-    searchUser: async (_, args) => {
-      const { username } = args;
-
-      const users = await UserAuth.searchUser({ username });
-
-      return users;
-    },
-  },
-
   Mutation: {
-    login: async (_, args) => {
-      const { email, password } = args;
-      if (!email) {
-        throw new Error("Email is required");
-      }
-      if (!password) {
-        throw new Error("Password is required");
-      }
+    follow: async (_, args, context) => {
+      const { userId } = context.authentication();
+      const { followingId } = args;
 
-      const user = await UserAuth.login({ email, password });
-      if (!user) {
-        throw new Error("Invalid Email or Password");
-      }
-      console.log(user);
+      await FollowUser.follow({ userId, followingId });
+
+      const follow = await FollowUser.findFollow({ userId, followingId });
+      // console.log(follow);
       
-       const access_token = signToken({userId:user._id}) 
-      return {access_token:access_token};
-    },
-    
-    register: async (_, args) => {
-      const { name, username, email, password } = args;
-      console.log(name);
-
-      if (!username) {
-        throw new Error("Username is required");
-      }
-      if (!email) {
-        throw new Error("Email is required");
-      }
-      if (!password) {
-        throw new Error("Password is required");
-      }
-      if (password.length < 5) {
-        throw new Error("Password Minimal length is 5");
-      }
-
-      const { byUserName, byUserEmail } = await UserAuth.findUser({
-        username,
-        email,
-      });
-      if (byUserName) {
-        throw new Error("User with that Username already exist");
-      }
-      if (byUserEmail) {
-        throw new Error("User with that email already exist");
-      }
-
-      const user = await UserAuth.register({ name, username, email, password });
-      //   console.log(user);
-
-      return user;
+      return follow;
     },
   },
 };
-//add
+
 module.exports = { typeDefsFollow, resolversFollow };

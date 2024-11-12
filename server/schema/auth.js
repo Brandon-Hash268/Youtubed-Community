@@ -3,15 +3,14 @@ const UserAuth = require("../model/userAuth");
 
 const typeDefsUser = `#graphql
     type User{
-        _id:ID
+        _id:ID!
         name:String
-        username:String
-        email:String
+        username:String!
+        email:String!
     }
 
     type Token{
-        access_token:String
-        user:User
+        access_token:String!
     }
 
     type Query{
@@ -36,7 +35,7 @@ const resolversUser = {
   },
 
   Mutation: {
-    login: async (_, args) => {
+    login: async (_, args,context) => {
       const { email, password } = args;
       if (!email) {
         throw new Error("Email is required");
@@ -45,16 +44,11 @@ const resolversUser = {
         throw new Error("Password is required");
       }
 
-      const user = await UserAuth.login({ email, password });
-      if (!user) {
-        throw new Error("Invalid Email or Password");
-      }
-      console.log(user);
+      const access_token = await UserAuth.login({ email, password });
 
-      const access_token = signToken({ userId: user._id });
-      console.log(access_token);
+      // console.log(access_token);
 
-      return { access_token, user };
+      return {access_token:access_token}
     },
 
     register: async (_, args) => {

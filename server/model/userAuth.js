@@ -1,5 +1,6 @@
 const { database } = require("../config/mongodb");
 const bcrypt = require("bcrypt");
+const { signToken } = require("../helpers/jwt");
 
 class UserAuth {
   static async findUser({ username, email }) {
@@ -15,20 +16,23 @@ class UserAuth {
 
     const user = await database
       .collection("Users")
-      .insertOne({ name, username, email, password:hashedPass });
+      .insertOne({ name, username, email, password: hashedPass });
     return user;
   }
 
   static async login({ email, password }) {
     const { byUserEmail: user } = await this.findUser({ email });
-    
-    const isValid = bcrypt.compareSync(password, user.password);
-
-    if (!isValid) {
-      return null
+    if (!user) {
+      throw new Error("Invalid Email or Password");
     }
-    
-    return user;
+
+    const isValid = bcrypt.compareSync(password, user.password);
+    if (!isValid) {
+      throw new Error("Invalid Email or Password");
+    }
+
+    const access_token = signToken({ userId: user._id });
+    return access_token;
   }
 
   static async searchUser({ username }) {
@@ -44,9 +48,9 @@ class UserAuth {
   }
 
   static async findUserById({ id }) {
-    const user = await database.collection("Users").findOne({ _id:id });
+    const user = await database.collection("Users").findOne({ _id: id });
 
-    return user
+    return user;
   }
 }
 
