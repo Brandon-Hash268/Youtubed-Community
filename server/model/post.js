@@ -26,11 +26,28 @@ class Post {
   }
 
   static async findById({ id }) {
-    const post = await database
-      .collection("Posts")
-      .findOne({ _id: new ObjectId(String(id)) });
+    const post = await database.collection("Posts").aggregate([
+      {
+        $match: { _id: new ObjectId(String(id)) },
+      },
+      {
+        $lookup: {
+          from: "Users",
+          localField: "authorId",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $unwind:"$author"
+      }
+    ]).toArray();
 
-    return post;
+    if (post.length === 0) {
+      throw new Error("Post not found");
+    }
+
+    return post[0];
   }
 
   static async addComment({ content, username, postId, createdAt, updatedAt }) {
@@ -57,12 +74,10 @@ class Post {
       createdAt,
       updatedAt,
     };
-    const isliked = database
-      .collection("Posts")
-      .findOne({
-        _id: new ObjectId(String(postId)),
-        likes: { $elemMatch: { username: username } },
-      });
+    const isliked = database.collection("Posts").findOne({
+      _id: new ObjectId(String(postId)),
+      likes: { $elemMatch: { username: username } },
+    });
 
     if (isliked) {
       throw new Error("You've liked this post");

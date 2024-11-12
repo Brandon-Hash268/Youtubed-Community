@@ -7,6 +7,8 @@ const typeDefsUser = `#graphql
         name:String
         username:String!
         email:String!
+        followers:[Follow]
+        following:[Follow]
     }
 
     type Token{
@@ -15,6 +17,7 @@ const typeDefsUser = `#graphql
 
     type Query{
         searchUser(username:String):[User]
+        getUserById(userId: ID!): User
     }
 
     type Mutation{
@@ -32,10 +35,19 @@ const resolversUser = {
 
       return users;
     },
+    getUserById: async (_, args) => {
+      const { userId } = args; 
+      // console.log(userId);
+      
+      const user = await UserAuth.findUserById({ id: userId });
+      console.log(user);
+      
+      return user;
+    },
   },
 
   Mutation: {
-    login: async (_, args,context) => {
+    login: async (_, args) => {
       const { email, password } = args;
       if (!email) {
         throw new Error("Email is required");
@@ -52,7 +64,7 @@ const resolversUser = {
 
       // console.log(access_token);
 
-      return {access_token:access_token}
+      return { access_token: access_token };
     },
 
     register: async (_, args) => {

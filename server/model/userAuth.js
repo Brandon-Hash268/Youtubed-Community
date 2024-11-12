@@ -1,6 +1,7 @@
 const { database } = require("../config/mongodb");
 const bcrypt = require("bcrypt");
 const { signToken } = require("../helpers/jwt");
+const { ObjectId } = require("mongodb");
 
 class UserAuth {
   static async findUser({ username, email }) {
@@ -49,9 +50,27 @@ class UserAuth {
   }
 
   static async findUserById({ id }) {
-    const user = await database.collection("Users").findOne({ _id: id });
+    const user = await database.collection("Users").aggregate([
+      { $match: { _id: new ObjectId(String(id)) } },
+      {
+        $lookup: {
+          from: "Follows",
+          localField: "_id",
+          foreignField: "followingId",
+          as: "followers",
+        },
+      },
+      {
+        $lookup: {
+          from: "Follows",
+          localField: "_id",
+          foreignField: "followerId",
+          as: "following",
+        },
+      },
+    ]).toArray();
 
-    return user;
+    return user[0];
   }
 }
 
