@@ -2,17 +2,6 @@ const { ObjectId } = require("mongodb");
 const { database } = require("../config/mongodb");
 
 class Post {
-  static async findOne({ content, tags, imgUrl, userId }) {
-    const post = await database.collection("Posts").findOne({
-      content,
-      tags,
-      imgUrl,
-      authorId: new ObjectId(String(userId)),
-    });
-
-    return post;
-  }
-
   static async addPost({ content, tags, imgUrl, userId }) {
     const added = await database.collection("Posts").insertOne({
       content,
@@ -34,6 +23,14 @@ class Post {
       .toArray();
 
     return posts;
+  }
+
+  static async findById({ id }) {
+    const post = await database
+      .collection("Posts")
+      .findOne({ _id: new ObjectId(String(id)) });
+
+    return post;
   }
 }
 module.exports = { Post };

@@ -30,6 +30,7 @@ const typeDefsPost = `#graphql
 
    type Query{
     getAllPost:[Post]
+    getPostById(id:ID!):Post
    }
 
   type Mutation {
@@ -47,6 +48,13 @@ const resolversPost = {
       const posts = await Post.allPost();
       return posts;
     },
+    getPostById: async (_,args, context) => {
+      context.authentication();
+      const {id} = args
+
+      const post = await Post.findById({id});
+      return post;
+    },
   },
   Mutation: {
     addPost: async (_, args, context) => {
@@ -59,9 +67,14 @@ const resolversPost = {
       }
       const { userId } = context.authentication();
 
-      await Post.addPost({ content, tags, imgUrl, userId });
+      const { insertedId } = await Post.addPost({
+        content,
+        tags,
+        imgUrl,
+        userId,
+      });
 
-      const post = await Post.findOne({ content, tags, imgUrl, userId });
+      const post = await Post.findById({ id: insertedId });
       return post;
     },
   },
