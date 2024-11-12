@@ -40,6 +40,10 @@ const resolversUser = {
       if (!email) {
         throw new Error("Email is required");
       }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Invalid email format");
+      }
       if (!password) {
         throw new Error("Password is required");
       }
@@ -60,6 +64,10 @@ const resolversUser = {
       }
       if (!email) {
         throw new Error("Email is required");
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        throw new Error("Invalid email format");
       }
       if (!password) {
         throw new Error("Password is required");

@@ -38,6 +38,7 @@ const typeDefsPost = `#graphql
     tags: [String]
     imgUrl: String): Post
     addComment(content:String!,postId:ID!):Comment
+    like(postId:ID!):Like
   }
 `;
 
@@ -80,18 +81,51 @@ const resolversPost = {
     },
 
     addComment: async (_, args, context) => {
-        console.log(context.authentication());
-        
+    //   console.log(context.authentication());
+
       const { username } = context.authentication();
       const { content, postId } = args;
       if (!content) {
-        throw new Error("Content is required")
+        throw new Error("Content is required");
       }
-      const createdAt= new Date()
-      const updatedAt= new Date()
+      if (!postId) {
+        throw new Error("Post Id is required");
+      }
 
-      await Post.addComment({ postId, content, username,createdAt,updatedAt });
-      return {content:content,username:username,createdAt,updatedAt};
+      const createdAt = new Date();
+      const updatedAt = new Date();
+
+      await Post.addComment({
+        postId,
+        content,
+        username,
+        createdAt,
+        updatedAt,
+      });
+      return { content: content, username: username, createdAt, updatedAt };
+    },
+
+    like: async (_, args, context) => {
+    //   console.log(context.authentication());
+
+      const { username } = context.authentication();
+      const { postId } = args;
+    //   console.log(postId);
+      
+      if (!postId) {
+        throw new Error("Post Id is required");
+      }
+      const createdAt = new Date();
+      const updatedAt = new Date();
+
+      await Post.addLike({
+        postId,
+        username,
+        createdAt,
+        updatedAt,
+      });
+
+      return {username: username, createdAt, updatedAt };
     },
   },
 };

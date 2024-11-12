@@ -50,5 +50,32 @@ class Post {
 
     return comment;
   }
+
+  static async addLike({ username, postId, createdAt, updatedAt }) {
+    const newLikes = {
+      username: username,
+      createdAt,
+      updatedAt,
+    };
+    const isliked = database
+      .collection("Posts")
+      .findOne({
+        _id: new ObjectId(String(postId)),
+        likes: { $elemMatch: { username: username } },
+      });
+
+    if (isliked) {
+      throw new Error("You've liked this post");
+    }
+    await database
+      .collection("Posts")
+      .updateOne(
+        { _id: new ObjectId(String(postId)) },
+        { $push: { likes: newLikes } }
+      );
+    // console.log(comment, "<<<<<<<<<<");
+
+    return "Liked";
+  }
 }
 module.exports = { Post };
