@@ -1,5 +1,6 @@
 // follow.js
 
+const redis = require("../config/redis");
 const { Post } = require("../model/post");
 
 const typeDefsPost = `#graphql
@@ -47,8 +48,19 @@ const resolversPost = {
     getAllPost: async (_, __, context) => {
       context.authentication();
 
-      const posts = await Post.allPost();
-      return posts;
+      const redistPost =await redis.get("posts");
+      if (redistPost) {
+        // console.log("REDISSSSSSSS");
+        
+        return JSON.parse(redistPost);
+    }
+    
+    const posts = await Post.allPost();
+    
+    await redis.set("posts", JSON.stringify(posts));
+    
+    // console.log("NOT REDIS");
+    return posts;
     },
     getPostById: async (_, args, context) => {
       context.authentication();
@@ -60,6 +72,7 @@ const resolversPost = {
   },
   Mutation: {
     addPost: async (_, args, context) => {
+      await redis.del("posts");
       const { content, tags, imgUrl } = args;
       if (!content) {
         throw new Error("Content is required");
@@ -81,7 +94,7 @@ const resolversPost = {
     },
 
     addComment: async (_, args, context) => {
-    //   console.log(context.authentication());
+      //   console.log(context.authentication());
 
       const { username } = context.authentication();
       const { content, postId } = args;
@@ -106,12 +119,12 @@ const resolversPost = {
     },
 
     like: async (_, args, context) => {
-    //   console.log(context.authentication());
+      //   console.log(context.authentication());
 
       const { username } = context.authentication();
       const { postId } = args;
-    //   console.log(postId);
-      
+      //   console.log(postId);
+
       if (!postId) {
         throw new Error("Post Id is required");
       }
@@ -125,7 +138,7 @@ const resolversPost = {
         updatedAt,
       });
 
-      return {username: username, createdAt, updatedAt };
+      return { username: username, createdAt, updatedAt };
     },
   },
 };
