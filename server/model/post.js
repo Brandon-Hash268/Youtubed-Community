@@ -12,6 +12,7 @@ class Post {
 
     return post;
   }
+
   static async addPost({ content, tags, imgUrl, userId }) {
     const added = await database.collection("Posts").insertOne({
       content,
@@ -24,5 +25,15 @@ class Post {
 
     return added;
   }
+
+  static async allPost() {
+    const posts = await database
+      .collection("Posts")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return posts;
+  }
 }
-module.exports={Post}
+module.exports = { Post };

@@ -28,6 +28,10 @@ const typeDefsPost = `#graphql
     updatedAt:String
   }
 
+   type Query{
+    getAllPost:[Post]
+   }
+
   type Mutation {
     addPost(content: String!
     tags: [String]
@@ -36,6 +40,14 @@ const typeDefsPost = `#graphql
 `;
 
 const resolversPost = {
+  Query: {
+    getAllPost: async (_, __, context) => {
+      context.authentication();
+
+      const posts = await Post.allPost();
+      return posts;
+    },
+  },
   Mutation: {
     addPost: async (_, args, context) => {
       const { content, tags, imgUrl } = args;
@@ -50,7 +62,7 @@ const resolversPost = {
       await Post.addPost({ content, tags, imgUrl, userId });
 
       const post = await Post.findOne({ content, tags, imgUrl, userId });
-      return post
+      return post;
     },
   },
 };
