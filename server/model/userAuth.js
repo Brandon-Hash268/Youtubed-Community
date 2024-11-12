@@ -32,8 +32,11 @@ class UserAuth {
       throw new Error("Invalid Email or Password");
     }
     // console.log(user);
-    
-    const access_token = signToken({ userId: user._id,username:user.username });
+
+    const access_token = signToken({
+      userId: user._id,
+      username: user.username,
+    });
     return access_token;
   }
 
@@ -50,25 +53,44 @@ class UserAuth {
   }
 
   static async findUserById({ id }) {
-    const user = await database.collection("Users").aggregate([
-      { $match: { _id: new ObjectId(String(id)) } },
-      {
-        $lookup: {
-          from: "Follows",
-          localField: "_id",
-          foreignField: "followingId",
-          as: "followers",
+    const user = await database
+      .collection("Users")
+      .aggregate([
+        { $match: { _id: new ObjectId(String(id)) } },
+        {
+          $lookup: {
+            from: "Follows",
+            localField: "_id",
+            foreignField: "followingId",
+            as: "followers",
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "Follows",
-          localField: "_id",
-          foreignField: "followerId",
-          as: "following",
+        {
+          $lookup: {
+            from: "Follows",
+            localField: "_id",
+            foreignField: "followerId",
+            as: "following",
+          },
         },
-      },
-    ]).toArray();
+        {
+          $lookup: {
+            from: "Users",
+            localField: "following.followingId",
+            foreignField: "_id",
+            as: "following",
+          },
+        },
+        {
+          $lookup: {
+            from: "Users",
+            localField: "followers.followerId",
+            foreignField: "_id",
+            as: "followers",
+          },
+        },
+      ])
+      .toArray();
 
     return user[0];
   }

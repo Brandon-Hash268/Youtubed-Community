@@ -2,13 +2,20 @@ const { signToken } = require("../helpers/jwt");
 const UserAuth = require("../model/userAuth");
 
 const typeDefsUser = `#graphql
+    type FollowUser{
+      _id:ID!
+      name:String
+      username:String!
+      email:String!
+    }
+
     type User{
         _id:ID!
         name:String
         username:String!
         email:String!
-        followers:[Follow]
-        following:[Follow]
+        followers:[FollowUser]
+        following:[FollowUser]
     }
 
     type Token{
@@ -36,12 +43,12 @@ const resolversUser = {
       return users;
     },
     getUserById: async (_, args) => {
-      const { userId } = args; 
+      const { userId } = args;
       // console.log(userId);
-      
+
       const user = await UserAuth.findUserById({ id: userId });
       console.log(user);
-      
+
       return user;
     },
   },
