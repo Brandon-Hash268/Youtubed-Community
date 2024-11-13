@@ -21,11 +21,8 @@ const resolversFollow = {
       const { userId } = context.authentication();
       const { followingId } = args;
 
-      await FollowUser.follow({ userId, followingId });
+      const follow = await FollowUser.follow({ userId, followingId });
 
-      const follow = await FollowUser.findFollow({ userId, followingId });
-      // console.log(follow);
-      
       return follow;
     },
   },

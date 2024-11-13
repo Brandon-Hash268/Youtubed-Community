@@ -1,5 +1,5 @@
 const { database } = require("../config/mongodb");
-const {ObjectId} = require("mongodb")
+const { ObjectId } = require("mongodb");
 
 class FollowUser {
   static async findFollow({ userId, followingId }) {
@@ -8,7 +8,7 @@ class FollowUser {
       followerId: new ObjectId(String(userId)),
     });
     // console.log(follow);
-    
+
     return follow;
   }
 
@@ -17,18 +17,25 @@ class FollowUser {
     console.log(isfollowed);
     
     if (isfollowed) {
-        throw new Error("You already followed this user")
+      // throw new Error("You already followed this user")
+      await database.collection("Follows").deleteOne({
+        followingId: new ObjectId(String(followingId)),
+        followerId: new ObjectId(String(userId)),
+      })
+      return isfollowed
     }
-
-    const follow = await database.collection("Follows").insertOne({
+    
+    await database.collection("Follows").insertOne({
       followingId: new ObjectId(String(followingId)),
       followerId: new ObjectId(String(userId)),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
+    const follow = await this.findFollow({ userId, followingId });
+    
     return follow;
   }
 }
 
-module.exports = {FollowUser}
+module.exports = { FollowUser };
