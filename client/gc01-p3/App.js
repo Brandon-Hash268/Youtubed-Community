@@ -78,8 +78,8 @@ export default function App() {
             name="Register"
             component={Register}
             options={styleHeader}
-          />
-          <Stack.Screen name="Login" component={Login} options={styleHeader} /> */}
+          /> */}
+          <Stack.Screen name="Login" component={Login} options={styleHeader} />
           <Stack.Screen
             name="Home"
             component={HomeTabs}
