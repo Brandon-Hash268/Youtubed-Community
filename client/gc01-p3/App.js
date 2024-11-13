@@ -74,11 +74,11 @@ export default function App() {
     <TamaguiProvider config={config}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
-          {/* <Stack.Screen
+          <Stack.Screen
             name="Register"
             component={Register}
             options={styleHeader}
-          /> */}
+          />
           <Stack.Screen name="Login" component={Login} options={styleHeader} />
           <Stack.Screen
             name="Home"
