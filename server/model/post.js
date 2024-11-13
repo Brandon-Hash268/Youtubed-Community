@@ -74,23 +74,33 @@ class Post {
       createdAt,
       updatedAt,
     };
-    const isliked = database.collection("Posts").findOne({
+    const isliked = await database.collection("Posts").findOne({
       _id: new ObjectId(String(postId)),
       likes: { $elemMatch: { username: username } },
     });
 
     if (isliked) {
-      throw new Error("You've liked this post");
-    }
-    await database
+      await database
+        .collection("Posts")
+        .updateOne(
+          { _id: new ObjectId(String(postId)) },
+          { $pull: { likes:{username: username} } }
+        );
+        console.log("deleted");
+        
+        return
+      }
+      await database
       .collection("Posts")
       .updateOne(
         { _id: new ObjectId(String(postId)) },
         { $push: { likes: newLikes } }
       );
-    // console.log(comment, "<<<<<<<<<<");
-
-    return "Liked";
+      // console.log(comment, "<<<<<<<<<<");
+      console.log(newLikes);
+      
+      console.log("add");
+    return;
   }
 }
 module.exports = { Post };
