@@ -4,14 +4,16 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createTamagui, TamaguiProvider } from "tamagui";
 import defaultConfig from "@tamagui/config/v3";
 import { HomeScreen } from "./screens/HomeScreen";
-import Ionicons from "@expo/vector-icons/Ionicons"
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Register } from "./screens/Register";
 import { Login } from "./screens/Login";
 import { AddPost } from "./screens/Addpost";
+import { ApolloProvider } from "@apollo/client";
+import { client } from "./config/apollo";
 
 export default function App() {
-  const Tab = createBottomTabNavigator()
+  const Tab = createBottomTabNavigator();
   const Stack = createNativeStackNavigator();
   const config = createTamagui(defaultConfig);
 
@@ -27,7 +29,7 @@ export default function App() {
     headerTintColor: "white",
   };
 
-  function HomeTabs(){
+  function HomeTabs() {
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -56,37 +58,35 @@ export default function App() {
           // },
         })}
       >
-        <Tab.Screen
-          name="AddPost"
-          component={AddPost}
-          options={styleHeader}
-        />
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={styleHeader}
-        />
+        <Tab.Screen name="AddPost" component={AddPost} options={styleHeader} />
+        <Tab.Screen name="Home" component={HomeScreen} options={styleHeader} />
       </Tab.Navigator>
     );
   }
 
   return (
-    <TamaguiProvider config={config}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={styleHeader}
-          />
-          <Stack.Screen name="Login" component={Login} options={styleHeader} />
-          <Stack.Screen
-            name="Home"
-            component={HomeTabs}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </TamaguiProvider>
+    <ApolloProvider client={client}>
+      <TamaguiProvider config={config}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home">
+            <Stack.Screen
+              name="Register"
+              component={Register}
+              options={styleHeader}
+            />
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={styleHeader}
+            />
+            <Stack.Screen
+              name="Home"
+              component={HomeTabs}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </TamaguiProvider>
+    </ApolloProvider>
   );
 }
