@@ -33,6 +33,7 @@ const typeDefsPost = `#graphql
    type Query{
     getAllPost:[Post]
     getPostById(id:ID!):Post
+    getPostByUserId(userId:ID!):[Post]
    }
 
   type Mutation {
@@ -47,31 +48,41 @@ const typeDefsPost = `#graphql
 const resolversPost = {
   Query: {
     getAllPost: async (_, __, context) => {
-      // context.authentication();
+      context.authentication();
 
-      const redistPost =await redis.get("posts");
-    //   if (redistPost) {
-    //     // console.log("REDISSSSSSSS");
-        
-    //     return JSON.parse(redistPost);
-    // }
-    
-    const posts = await Post.allPost();
-    // posts.forEach((post) => {
-    //   console.log(post); 
-    // });
-    
-    await redis.set("posts", JSON.stringify(posts));
-    
-    // console.log(posts.author);
-    return posts;
+      const redistPost = await redis.get("posts");
+      if (redistPost) {
+        // console.log("REDISSSSSSSS");
+
+        return JSON.parse(redistPost);
+      }
+
+      const posts = await Post.allPost();
+      // posts.forEach((post) => {
+      //   console.log(post);
+      // });
+
+      await redis.set("posts", JSON.stringify(posts));
+
+      // console.log("NOT REDIS");
+      return posts;
     },
-    
+
     getPostById: async (_, args, context) => {
       context.authentication();
       const { id } = args;
 
       const post = await Post.findById({ id });
+      return post;
+    },
+
+    getPostByUserId: async (_, args, context) => {
+      context.authentication();
+      const { userId } = args;
+
+      const post = await Post.getPostByUserId({ id:userId });
+      console.log(post,"POSTTTTTTTTTTTTTTTTTTTT");
+      
       return post;
     },
   },
@@ -120,12 +131,13 @@ const resolversPost = {
         createdAt,
         updatedAt,
       });
+      redis.del("posts");
       return { content: content, username: username, createdAt, updatedAt };
     },
 
     like: async (_, args, context) => {
       //   console.log(context.authentication());
-
+      redis.del("posts");
       const { username } = context.authentication();
       const { postId } = args;
       //   console.log(postId);
@@ -142,7 +154,6 @@ const resolversPost = {
         createdAt,
         updatedAt,
       });
-
       return { username: username, createdAt, updatedAt };
     },
   },

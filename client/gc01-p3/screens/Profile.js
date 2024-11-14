@@ -103,7 +103,7 @@ export function Profile() {
               UnSubscribe
             </Button>
           ) : (
-            <Button backgroundColor="#e61c1c" onPress={handlefollow}>
+            <Button backgroundColor="#EF0808" onPress={handlefollow}>
               Subscribe
             </Button>
           )}

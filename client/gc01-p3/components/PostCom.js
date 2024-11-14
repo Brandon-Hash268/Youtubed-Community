@@ -28,6 +28,12 @@ export function RenderedItem({ item }) {
       Alert.alert("Error", error.message);
     }
   };
+//   item.tags.map(e=>{
+//       console.log(e);
+
+//   })
+
+  
 
   return (
     <YStack
@@ -67,13 +73,18 @@ export function RenderedItem({ item }) {
 
           <Text color="white" fontSize={12} marginTop={8}>
             {item.tags.map((tag, index) => (
-              <Text key={index} style={{ marginRight: 8 }}>
+              <Text
+                key={index}
+                color="white"
+                fontSize={12}
+                style={{ marginRight: 8 }}
+              >
                 #{tag}
               </Text>
             ))}
           </Text>
           <Text color="white">
-            {new Date(Number(item.createdAt)).toLocaleDateString()}
+            {new Date(Number(item.createdAt)).toLocaleString().split(",")[0]}
           </Text>
           <Text
             color="white"

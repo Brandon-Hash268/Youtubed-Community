@@ -33,10 +33,38 @@ class Post {
       ])
       .sort({ createdAt: -1 })
       .toArray();
-      
-      //  posts.forEach((post) => {
-      //    console.log(post.author);
-      //  });
+
+    //  posts.forEach((post) => {
+    //    console.log(post.author);
+    //  });
+    return posts;
+  }
+
+  static async getPostByUserId({id}) {
+    const posts = await database
+      .collection("Posts")
+      .aggregate([
+        {
+          $match:{authorId:new ObjectId(String(id))}
+        },
+        {
+          $lookup: {
+            from: "Users",
+            localField: "authorId",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+        {
+          $unwind: "$author",
+        },
+      ])
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    //  posts.forEach((post) => {
+    //    console.log(post.author);
+    //  });
     return posts;
   }
 
@@ -104,7 +132,7 @@ class Post {
           { _id: new ObjectId(String(postId)) },
           { $pull: { likes: { username: username } } }
         );
-      console.log("deleted");
+      // console.log("deleted");
 
       return;
     }
@@ -115,9 +143,9 @@ class Post {
         { $push: { likes: newLikes } }
       );
     // console.log(comment, "<<<<<<<<<<");
-    console.log(newLikes);
+    // console.log(newLikes);
 
-    console.log("add");
+    // console.log("add");
     return;
   }
 }
