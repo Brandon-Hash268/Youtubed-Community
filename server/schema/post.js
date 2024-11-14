@@ -47,22 +47,26 @@ const typeDefsPost = `#graphql
 const resolversPost = {
   Query: {
     getAllPost: async (_, __, context) => {
-      context.authentication();
+      // context.authentication();
 
       const redistPost =await redis.get("posts");
-      if (redistPost) {
-        // console.log("REDISSSSSSSS");
+    //   if (redistPost) {
+    //     // console.log("REDISSSSSSSS");
         
-        return JSON.parse(redistPost);
-    }
+    //     return JSON.parse(redistPost);
+    // }
     
     const posts = await Post.allPost();
+    // posts.forEach((post) => {
+    //   console.log(post); 
+    // });
     
     await redis.set("posts", JSON.stringify(posts));
     
-    // console.log("NOT REDIS");
+    // console.log(posts.author);
     return posts;
     },
+    
     getPostById: async (_, args, context) => {
       context.authentication();
       const { id } = args;

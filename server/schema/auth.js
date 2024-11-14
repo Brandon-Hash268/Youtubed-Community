@@ -20,6 +20,7 @@ const typeDefsUser = `#graphql
 
     type Token{
         access_token:String!
+        username:String
     }
 
     type Query{
@@ -68,10 +69,10 @@ const resolversUser = {
       }
 
       const access_token = await UserAuth.login({ email, password });
+      const { byUserEmail } = await UserAuth.findUser({ email });
+      // console.log(byUserEmail);
 
-      // console.log(access_token);
-
-      return { access_token: access_token };
+      return { access_token: access_token,username:byUserEmail.username };
     },
 
     register: async (_, args) => {

@@ -18,30 +18,48 @@ class Post {
   static async allPost() {
     const posts = await database
       .collection("Posts")
-      .find()
+      .aggregate([
+        {
+          $lookup: {
+            from: "Users",
+            localField: "authorId",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+        {
+          $unwind: "$author",
+        },
+      ])
       .sort({ createdAt: -1 })
       .toArray();
-
+      
+      //  posts.forEach((post) => {
+      //    console.log(post.author);
+      //  });
     return posts;
   }
 
   static async findById({ id }) {
-    const post = await database.collection("Posts").aggregate([
-      {
-        $match: { _id: new ObjectId(String(id)) },
-      },
-      {
-        $lookup: {
-          from: "Users",
-          localField: "authorId",
-          foreignField: "_id",
-          as: "author",
+    const post = await database
+      .collection("Posts")
+      .aggregate([
+        {
+          $match: { _id: new ObjectId(String(id)) },
         },
-      },
-      {
-        $unwind:"$author"
-      }
-    ]).toArray();
+        {
+          $lookup: {
+            from: "Users",
+            localField: "authorId",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+        {
+          $unwind: "$author",
+        },
+      ])
+      .toArray();
 
     if (post.length === 0) {
       throw new Error("Post not found");
@@ -84,22 +102,22 @@ class Post {
         .collection("Posts")
         .updateOne(
           { _id: new ObjectId(String(postId)) },
-          { $pull: { likes:{username: username} } }
+          { $pull: { likes: { username: username } } }
         );
-        console.log("deleted");
-        
-        return
-      }
-      await database
+      console.log("deleted");
+
+      return;
+    }
+    await database
       .collection("Posts")
       .updateOne(
         { _id: new ObjectId(String(postId)) },
         { $push: { likes: newLikes } }
       );
-      // console.log(comment, "<<<<<<<<<<");
-      console.log(newLikes);
-      
-      console.log("add");
+    // console.log(comment, "<<<<<<<<<<");
+    console.log(newLikes);
+
+    console.log("add");
     return;
   }
 }
