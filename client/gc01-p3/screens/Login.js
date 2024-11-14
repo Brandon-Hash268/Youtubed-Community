@@ -1,8 +1,42 @@
+import { useMutation } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
+import { useContext, useState } from "react";
+import { Alert } from "react-native";
 import { Button, Form, Input, Text, View, YStack, XStack } from "tamagui";
+import { LOGIN } from "../operations/user";
+import * as SecureStore from "expo-secure-store"
+import { AuthContext } from "../context/auth";
 
 export function Login() {
-    const navigation = useNavigation()
+  const navigation = useNavigation();
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [login, { loading, error, data }] = useMutation(LOGIN);
+
+  const handleChange = (name, value) => {
+    setUser((prevValue) => ({
+      ...prevValue,
+      [name]: value,
+    }));
+    console.log(user);
+  };
+  const authContext = useContext(AuthContext)
+
+  const handelSubmit = async () => {
+    try {
+      await login({ variables: user });
+      // await console.log(data.login.username);
+      await SecureStore.setItemAsync("access_token",data.login.access_token)
+      await SecureStore.setItemAsync("username",data.login.username)
+      // console.log(await SecureStore.getItemAsync("access_token"),"aaaaaaaaaaaaaaaa");
+      authContext.signedIn(true)
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
   return (
     <View
       backgroundColor="black"
@@ -33,30 +67,18 @@ export function Login() {
 
         <Form gap="16">
           <Input
-            backgroundColor="#3a3a3a"
-            color="#c7c7c7"
-            placeholder="Name"
-            placeholderTextColor="#777"
-            borderRadius={8}
-            padding={12}
-          />
-          <Input
-            backgroundColor="#3a3a3a"
-            color="#c7c7c7"
-            placeholder="Username"
-            placeholderTextColor="#777"
-            borderRadius={8}
-            padding={12}
-          />
-          <Input
+            name="email"
             backgroundColor="#3a3a3a"
             color="#c7c7c7"
             placeholder="Email"
             placeholderTextColor="#777"
             borderRadius={8}
             padding={12}
+            onChangeText={(text) => handleChange("email", text)}
+            value={user.email}
           />
           <Input
+            name="password"
             backgroundColor="#3a3a3a"
             color="#c7c7c7"
             placeholder="Password"
@@ -64,18 +86,22 @@ export function Login() {
             secureTextEntry
             borderRadius={8}
             padding={12}
+            onChangeText={(text) => handleChange("password", text)}
+            value={user.password}
           />
-
-          <Button
-            theme="active"
-            backgroundColor="#565656"
-            color="white"
-            marginTop="20"
-            borderRadius={8}
-            padding={12}
-          >
-            Sign In
-          </Button>
+          <Form.Trigger>
+            <Button
+              theme="active"
+              backgroundColor="#565656"
+              color="white"
+              marginTop="20"
+              borderRadius={8}
+              padding={10}
+              onPress={handelSubmit}
+            >
+              Sign In
+            </Button>
+          </Form.Trigger>
         </Form>
 
         <XStack justifyContent="center" marginTop={20}>

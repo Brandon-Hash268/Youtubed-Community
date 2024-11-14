@@ -11,8 +11,13 @@ import { Login } from "./screens/Login";
 import { AddPost } from "./screens/Addpost";
 import { ApolloProvider } from "@apollo/client";
 import { client } from "./config/apollo";
+import { useEffect, useState } from "react";
+import { AuthContext } from "./context/auth";
+import * as SecureStore from "expo-secure-store"
 
 export default function App() {
+  const [signedIn, setSignedIn] = useState(false);
+
   const Tab = createBottomTabNavigator();
   const Stack = createNativeStackNavigator();
   const config = createTamagui(defaultConfig);
@@ -28,6 +33,13 @@ export default function App() {
     },
     headerTintColor: "white",
   };
+
+  useEffect(()=>{
+    const token = SecureStore.getItem("access_token")
+    if (token) {
+      setSignedIn(true)
+    }
+  },[])
 
   function HomeTabs() {
     return (
@@ -58,35 +70,45 @@ export default function App() {
           // },
         })}
       >
-        <Tab.Screen name="AddPost" component={AddPost} options={styleHeader} />
         <Tab.Screen name="Home" component={HomeScreen} options={styleHeader} />
+        <Tab.Screen name="AddPost" component={AddPost} options={styleHeader} />
       </Tab.Navigator>
     );
   }
 
   return (
     <ApolloProvider client={client}>
-      <TamaguiProvider config={config}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Home">
-            <Stack.Screen
-              name="Register"
-              component={Register}
-              options={styleHeader}
-            />
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={styleHeader}
-            />
-            <Stack.Screen
-              name="Home"
-              component={HomeTabs}
-              options={{ headerShown: false }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </TamaguiProvider>
+      <AuthContext.Provider value={{
+        signedIn,
+        setSignedIn
+      }}>
+        <TamaguiProvider config={config}>
+          <NavigationContainer>
+            <Stack.Navigator>
+              {!signedIn ? (
+                <>
+                  <Stack.Screen
+                    name="Login"
+                    component={Login}
+                    options={styleHeader}
+                  />
+                  <Stack.Screen
+                    name="Register"
+                    component={Register}
+                    options={styleHeader}
+                  />
+                </>
+              ) : (
+                <Stack.Screen
+                  name="Home"
+                  component={HomeTabs}
+                  options={{ headerShown: false }}
+                />
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </TamaguiProvider>
+      </AuthContext.Provider>
     </ApolloProvider>
   );
 }
