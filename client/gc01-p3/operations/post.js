@@ -22,6 +22,7 @@ export const GET_POST = gql`
       createdAt
       updatedAt
       author {
+        _id
         username
       }
     }
@@ -75,6 +76,34 @@ export const GET_POST_DETAIL = gql`
         name
         username
         email
+      }
+    }
+  }
+`;
+
+export const GET_POST_BY_USER = gql`
+  query GetPostByUserId($userId: ID!) {
+    getPostByUserId(userId: $userId) {
+      _id
+      content
+      tags
+      imgUrl
+      authorId
+      comments {
+        content
+        username
+        createdAt
+        updatedAt
+      }
+      likes {
+        username
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+      author {
+        username
       }
     }
   }

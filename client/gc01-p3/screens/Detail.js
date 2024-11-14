@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useRoute } from "@react-navigation/native";
 import { COMMENT, GET_POST, GET_POST_DETAIL, LIKE } from "../operations/post";
 import { Button, Image, Input, ScrollView, Text, View, XStack, YStack } from "tamagui";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as SecureStore from "expo-secure-store";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -111,7 +111,20 @@ export function Detail() {
                 </Text>
               ))}
             </Text>
-            <Text color="white" fontSize={12} marginTop={8}>
+            <Text color="white">
+              {new Date(Number(item.createdAt)).toLocaleString().split(",")[0]}
+            </Text>
+            <Text
+              color="white"
+              fontSize={12}
+              marginTop={8}
+              numberOfLines={0} // Allows text to wrap onto multiple lines
+              lineBreakMode="word-wrap" // Controls line breaking (works mainly on iOS)
+              style={{
+                width: "100%",
+                maxWidth: "90%", // Adjust this value to prevent overflow if needed
+              }}
+            >
               {item.content}
             </Text>
           </YStack>
@@ -159,7 +172,10 @@ export function Detail() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 16 }}
       >
-        <XStack width="100%" marginBottom={12}>
+        <XStack width="100%" marginBottom={12} justifyContent="center" alignItems="center">
+            <View>
+                
+            </View>
           <Input
             placeholder="Add a comment..."
             width="80%"

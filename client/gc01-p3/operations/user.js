@@ -29,3 +29,39 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const GET_USER = gql`
+  query GetUserById($userId: ID!) {
+    getUserById(userId: $userId) {
+      _id
+      name
+      username
+      email
+      followers {
+        _id
+        name
+        username
+        email
+      }
+      following {
+        _id
+        name
+        username
+        email
+      }
+    }
+  }
+`;
+
+export const FOLLOW = gql`
+  mutation Mutation($followingId: ID!) {
+    follow(followingId: $followingId) {
+      _id
+      followingId
+      followerId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
