@@ -27,3 +27,13 @@ export const GET_POST = gql`
     }
   }
 `;
+
+export const LIKE = gql`
+  mutation Mutation($postId: ID!) {
+    like(postId: $postId) {
+      username
+      createdAt
+      updatedAt
+    }
+  }
+`;

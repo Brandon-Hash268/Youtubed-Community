@@ -1,13 +1,18 @@
-import { useQuery } from "@apollo/client";
-import { FlatList, View } from "react-native";
+import { useMutation, useQuery } from "@apollo/client";
+import { Alert, FlatList, TouchableOpacity, View } from "react-native";
 import { Text, Image, YStack, XStack } from "tamagui";
-import { GET_POST } from "../operations/post";
+import { GET_POST, LIKE } from "../operations/post";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { ActivityIndicator } from "react-native-paper";
+import * as SecureStore from "expo-secure-store";
 
 export function HomeScreen() {
   const { loading, error, data } = useQuery(GET_POST);
+  const username = SecureStore.getItem("username");
+  const [like,{}] = useMutation(LIKE)
+  // console.log(username);
+
   // console.log(data.getAllPost[0]);
   // console.log(GET_POST);
   // console.log(loading,"loadinggggggggggggggggggggggggggggggggggggggggggggggggggg");
@@ -15,8 +20,21 @@ export function HomeScreen() {
     return <ActivityIndicator size="large" color="white" />;
   }
   if (error) {
-    return <Text>{error.message}</Text>
+    return <Text>{error.message}</Text>;
   }
+
+  const handleLike = async(postId)=>{
+    try {
+      await like({variables:{postId},refetchQueries:[{query:GET_POST}]})
+    } catch (error) {
+      Alert.alert("Error",error.message)
+    }
+  }
+
+  const isLikedByUser = (likes) => {
+    if (!likes || !username) return false;
+    return likes.some((like) => like.username === username);
+  };
 
   const renderedItem = ({ item }) => (
     <YStack
@@ -64,14 +82,26 @@ export function HomeScreen() {
           </Text>
         </YStack>
       </XStack>
-      <Image src={item.imgUrl} alt={item.content} width="100%" height={200} />
+      <Image
+        src={item.imgUrl}
+        alt={item.content}
+        width="100%"
+        height="200"
+        resizeMode="contain"
+      />
       <XStack
         marginHorizontal={16}
         marginVertical={15}
         justifyContent="space-between"
       >
         <XStack gap={8} justifyContent="center" alignItems="center">
-          <AntDesign name="like2" size={24} color="white" />
+          <TouchableOpacity onPress={() => handleLike(item._id)}>
+            <AntDesign
+              name={isLikedByUser(item.likes) ? "like1" : "like2"}
+              size={24}
+              color="white"
+            />
+          </TouchableOpacity>
 
           <Text paddingTop={4} color="white">
             {item.likes ? item.likes.length : "0"}

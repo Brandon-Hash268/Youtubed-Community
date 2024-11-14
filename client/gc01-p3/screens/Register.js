@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { Button, Form, Input, Text, View, YStack, XStack } from "tamagui";
-import { LOGIN, REGISTER } from "../operations/user";
+import { REGISTER } from "../operations/user";
 
 export function Register() {
   const navigation = useNavigation();
