@@ -4,32 +4,38 @@ import { Text, Image, YStack, XStack } from "tamagui";
 import { GET_POST, LIKE } from "../operations/post";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { ActivityIndicator } from "react-native-paper";
 import * as SecureStore from "expo-secure-store";
+import { useNavigation } from "@react-navigation/native";
+import { ErrorScreen, loadingScreen } from "../components/loading";
 
 export function HomeScreen() {
+  const navigation = useNavigation();
   const { loading, error, data } = useQuery(GET_POST);
   const username = SecureStore.getItem("username");
-  const [like,{}] = useMutation(LIKE)
+  const [like, {}] = useMutation(LIKE);
   // console.log(username);
 
   // console.log(data.getAllPost[0]);
   // console.log(GET_POST);
   // console.log(loading,"loadinggggggggggggggggggggggggggggggggggggggggggggggggggg");
+
   if (loading) {
     return <ActivityIndicator size="large" color="white" />;
   }
   if (error) {
-    return <Text>{error.message}</Text>;
+    Alert.alert("Error", error.message);
   }
 
-  const handleLike = async(postId)=>{
+  const handleLike = async (postId) => {
     try {
-      await like({variables:{postId},refetchQueries:[{query:GET_POST}]})
+      await like({
+        variables: { postId },
+        refetchQueries: [{ query: GET_POST }],
+      });
     } catch (error) {
-      Alert.alert("Error",error.message)
+      Alert.alert("Error", error.message);
     }
-  }
+  };
 
   const isLikedByUser = (likes) => {
     if (!likes || !username) return false;
@@ -64,8 +70,9 @@ export function HomeScreen() {
 
         <YStack padding={12}>
           <Text color="white" fontSize={16} fontWeight="bold">
-            {item.content}
+            {item.author.username}
           </Text>
+
           {/* <Text color="white">{item.tags}</Text> */}
           <Text color="white" fontSize={12} marginTop={8}>
             {/* Convert the tag string into an array and map over it */}
@@ -80,15 +87,22 @@ export function HomeScreen() {
               </Text>
             ))}
           </Text>
+          <Text color="white" fontSize={12} marginTop={8}>
+            {item.content}
+          </Text>
         </YStack>
       </XStack>
-      <Image
-        src={item.imgUrl}
-        alt={item.content}
-        width="100%"
-        height="200"
-        resizeMode="contain"
-      />
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Detail", { id: item._id })}
+      >
+        <Image
+          src={item.imgUrl}
+          alt={item.content}
+          width="100%"
+          height="200"
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
       <XStack
         marginHorizontal={16}
         marginVertical={15}
@@ -123,6 +137,7 @@ export function HomeScreen() {
 
   return (
     <FlatList
+      style={{ backgroundColor: "black" }}
       data={data.getAllPost} // Pass the data here
       renderItem={renderedItem} // Pass the renderItem function
       keyExtractor={(item) => item._id.toString()} // Ensure keyExtractor is used

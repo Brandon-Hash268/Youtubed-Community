@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createTamagui, TamaguiProvider } from "tamagui";
+import { createTamagui, TamaguiProvider, Text } from "tamagui";
 import defaultConfig from "@tamagui/config/v3";
 import { HomeScreen } from "./screens/HomeScreen";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -13,7 +13,9 @@ import { ApolloProvider } from "@apollo/client";
 import { client } from "./config/apollo";
 import { useEffect, useState } from "react";
 import { AuthContext } from "./context/auth";
-import * as SecureStore from "expo-secure-store"
+import * as SecureStore from "expo-secure-store";
+import { Detail } from "./screens/Detail";
+import { TouchableOpacity } from "react-native";
 
 export default function App() {
   const [signedIn, setSignedIn] = useState(false);
@@ -34,12 +36,12 @@ export default function App() {
     headerTintColor: "white",
   };
 
-  useEffect(()=>{
-    const token = SecureStore.getItem("access_token")
+  useEffect(() => {
+    const token = SecureStore.getItem("access_token");
     if (token) {
-      setSignedIn(true)
+      setSignedIn(true);
     }
-  },[])
+  }, []);
 
   function HomeTabs() {
     return (
@@ -70,7 +72,23 @@ export default function App() {
           // },
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} options={styleHeader} />
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            ...styleHeader,
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={async () => {
+                  await SecureStore.deleteItemAsync("access_token");
+                  setSignedIn(false);
+                }}
+              >
+                <Text style={{ color: "red", marginRight: 10 }}>Logout</Text>
+              </TouchableOpacity>
+            ),
+          }}
+        />
         <Tab.Screen name="AddPost" component={AddPost} options={styleHeader} />
       </Tab.Navigator>
     );
@@ -78,10 +96,12 @@ export default function App() {
 
   return (
     <ApolloProvider client={client}>
-      <AuthContext.Provider value={{
-        signedIn,
-        setSignedIn
-      }}>
+      <AuthContext.Provider
+        value={{
+          signedIn,
+          setSignedIn,
+        }}
+      >
         <TamaguiProvider config={config}>
           <NavigationContainer>
             <Stack.Navigator>
@@ -99,11 +119,18 @@ export default function App() {
                   />
                 </>
               ) : (
-                <Stack.Screen
-                  name="Home"
-                  component={HomeTabs}
-                  options={{ headerShown: false }}
-                />
+                <>
+                  <Stack.Screen
+                    name="Home"
+                    component={HomeTabs}
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="Detail"
+                    component={Detail}
+                    options={styleHeader}
+                  />
+                </>
               )}
             </Stack.Navigator>
           </NavigationContainer>

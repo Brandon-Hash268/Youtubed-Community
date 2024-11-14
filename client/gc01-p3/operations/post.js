@@ -37,3 +37,45 @@ export const LIKE = gql`
     }
   }
 `;
+
+export const COMMENT = gql`
+  mutation AddComment($content: String!, $postId: ID!) {
+    addComment(content: $content, postId: $postId) {
+      content
+      username
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_POST_DETAIL = gql`
+  query GetPostById($getPostByIdId: ID!) {
+    getPostById(id: $getPostByIdId) {
+      _id
+      content
+      tags
+      imgUrl
+      authorId
+      comments {
+        content
+        username
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+      likes {
+        username
+        createdAt
+        updatedAt
+      }
+      author {
+        _id
+        name
+        username
+        email
+      }
+    }
+  }
+`;
