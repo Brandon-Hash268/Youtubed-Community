@@ -103,8 +103,34 @@ export const GET_POST_BY_USER = gql`
       createdAt
       updatedAt
       author {
+        _id
         username
       }
+    }
+  }
+`;
+
+export const ADD_POST = gql`
+  mutation AddPost($content: String!, $tags: [String], $imgUrl: String) {
+    addPost(content: $content, tags: $tags, imgUrl: $imgUrl) {
+      _id
+      content
+      tags
+      imgUrl
+      authorId
+      comments {
+        content
+        username
+        createdAt
+        updatedAt
+      }
+      likes {
+        username
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
     }
   }
 `;

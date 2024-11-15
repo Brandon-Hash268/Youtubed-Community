@@ -42,14 +42,52 @@ class UserAuth {
 
   static async searchUser({ username }) {
     const regex = new RegExp(username, "i");
-    const user = await database
-      .collection("Users")
-      .find({
-        $or: [{ username: { $regex: regex } }, { name: { $regex: regex } }],
-      })
-      .toArray();
 
-    return user;
+    const users = await database
+      .collection("Users")
+      .aggregate([
+        {
+          $match: {
+            $or: [{ username: { $regex: regex } }, { name: { $regex: regex } }],
+          },
+        },
+        {
+          $lookup: {
+            from: "Follows",
+            localField: "_id",
+            foreignField: "followingId",
+            as: "followers",
+          },
+        },
+        {
+          $lookup: {
+            from: "Follows",
+            localField: "_id",
+            foreignField: "followerId",
+            as: "following",
+          },
+        },
+        {
+          $lookup: {
+            from: "Users",
+            localField: "following.followingId",
+            foreignField: "_id",
+            as: "following",
+          },
+        },
+        {
+          $lookup: {
+            from: "Users",
+            localField: "followers.followerId",
+            foreignField: "_id",
+            as: "followers",
+          },
+        },
+      ])
+      .toArray();
+      // console.log(users);
+      
+    return users;
   }
 
   static async findUserById({ id }) {

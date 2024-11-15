@@ -26,6 +26,7 @@ export const LOGIN = gql`
     login(email: $email, password: $password) {
       access_token
       username
+      userId
     }
   }
 `;
@@ -61,6 +62,29 @@ export const FOLLOW = gql`
       followerId
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const SEARCH_USER = gql`
+  query SearchUser($username: String) {
+    searchUser(username: $username) {
+      _id
+      name
+      username
+      email
+      following {
+        _id
+        name
+        username
+        email
+      }
+      followers {
+        _id
+        name
+        username
+        email
+      }
     }
   }
 `;

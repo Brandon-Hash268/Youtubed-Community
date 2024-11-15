@@ -15,11 +15,11 @@ import { GET_POST_BY_USER } from "../operations/post";
 import { RenderedItem } from "../components/PostCom";
 import * as SecureStore from "expo-secure-store";
 
-export function Profile() {
+export function SelfProfile() {
   const navigation = useNavigation();
   const username = SecureStore.getItem("username");
+  const userId = SecureStore.getItem("userId")
 
-  const { params } = useRoute();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState([]); // To store the list of followers or following
   const [modalTitle, setModalTitle] = useState(""); // To set the modal title
@@ -27,15 +27,14 @@ export function Profile() {
     refetchQueries: [
       {
         query: GET_USER,
-        variables: { userId: params.id },
+        variables: { userId },
       },
     ],
   });
-  
 
   const { loading, error, data } = useQuery(GET_USER, {
     variables: {
-      userId: params.id,
+      userId: userId,
     },
   });
 
@@ -45,9 +44,10 @@ export function Profile() {
     data: data2,
   } = useQuery(GET_POST_BY_USER, {
     variables: {
-      userId: params.id,
+      userId,
     },
   });
+
 
   // console.log(user);
 
@@ -82,26 +82,27 @@ export function Profile() {
     }
   };
 
-  useEffect(()=>{
-    if(modalTitle == "Subscribers"){
-      setModalContent(user.followers)
-    }else if (modalTitle == "Subscribing") {
-      setModalContent(user.following)
+  
 
+  useEffect(() => {
+      if (modalTitle == "Subscribers") {
+          setModalContent(user.followers);
+        } else if (modalTitle == "Subscribing") {
+            setModalContent(user.following);
+        }
+    }, [user, modalTitle]);
+
+    if (loading || loading2) {
+      return <ActivityIndicator size="large" color="white" />;
     }
-  },[user,modalTitle])
-
-  if (loading || loading2) {
-    return <ActivityIndicator size="large" color="white" />;
-  }
-
-  if (error || error2) {
-    return Alert.alert("Error", error.message);
-  }
-
-  const user = data.getUserById;
-  const post = data2.getPostByUserId;
-
+  
+    if (error || error2) {
+      return Alert.alert("Error", error.message);
+    }
+  
+    const user = data.getUserById;
+    const post = data2.getPostByUserId;
+    
   return (
     <View backgroundColor="black" height="100%" padding={16}>
       <YStack alignItems="center" marginBottom={20}>
@@ -117,14 +118,14 @@ export function Profile() {
             {isfollowed(user.followers) ? (
               <Button
                 backgroundColor="white"
-                onPress={() => handlefollow(params.id)}
+                onPress={() => handlefollow(userId)}
               >
                 UnSubscribe
               </Button>
             ) : (
               <Button
                 backgroundColor="#EF0808"
-                onPress={() => handlefollow(params.id)}
+                onPress={() => handlefollow(userId)}
               >
                 Subscribe
               </Button>
@@ -210,7 +211,6 @@ export function Profile() {
                       </Text>
                     </View>
                     {username !== item.username && (
-                      // {modalTitle == "Subscribing"},
                       <View marginTop={10}>
                         {isfollowed([item]) ? (
                           <>
@@ -224,7 +224,7 @@ export function Profile() {
                           </>
                         ) : (
                           <>
-                            {console.log(isfollowed([item]),item, "aaaaaa")}
+                            {console.log(isfollowed([item]), item, "aaaaaa")}
                             <Button
                               backgroundColor="#EF0808"
                               onPress={() => handlefollow(item._id)}

@@ -28,12 +28,10 @@ export function RenderedItem({ item }) {
       Alert.alert("Error", error.message);
     }
   };
-//   item.tags.map(e=>{
-//       console.log(e);
+  //   item.tags.map(e=>{
+  //       console.log(e);
 
-//   })
-
-  
+  //   })
 
   return (
     <YStack
@@ -86,16 +84,13 @@ export function RenderedItem({ item }) {
           <Text color="white">
             {new Date(Number(item.createdAt)).toLocaleString().split(",")[0]}
           </Text>
-          <Text
-            color="white"
-            fontSize={12}
-            marginTop={8}
-            style={{ width: "90%" }}
-          >
-            {item.content}
-          </Text>
         </YStack>
       </XStack>
+      <View marginHorizontal={20}>
+        <Text color="white" fontSize={12} style={{ width: "90%" }}>
+          {item.content}
+        </Text>
+      </View>
 
       <TouchableOpacity
         onPress={() => navigation.navigate("Detail", { id: item._id })}
@@ -124,15 +119,18 @@ export function RenderedItem({ item }) {
           </TouchableOpacity>
           <Text color="white">{item.likes?.length || "0"}</Text>
         </XStack>
-
-        <XStack gap={8} alignItems="center">
-          <MaterialCommunityIcons
-            name="comment-multiple-outline"
-            size={24}
-            color="white"
-          />
-          <Text color="white">{item.comments?.length || "0"}</Text>
-        </XStack>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Detail", { id: item._id })}
+        >
+          <XStack gap={8} alignItems="center">
+            <MaterialCommunityIcons
+              name="comment-multiple-outline"
+              size={24}
+              color="white"
+            />
+            <Text color="white">{item.comments?.length || "0"}</Text>
+          </XStack>
+        </TouchableOpacity>
       </XStack>
     </YStack>
   );

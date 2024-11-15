@@ -6,6 +6,7 @@ import { Button, Form, Input, Text, View, YStack, XStack } from "tamagui";
 import { LOGIN } from "../operations/user";
 import * as SecureStore from "expo-secure-store"
 import { AuthContext } from "../context/auth";
+import { ActivityIndicator } from "react-native-paper";
 
 export function Login() {
   const navigation = useNavigation();
@@ -15,6 +16,8 @@ export function Login() {
   });
 
   const [login, { loading, error, data }] = useMutation(LOGIN);
+  // console.log(data);
+  
 
   const handleChange = (name, value) => {
     setUser((prevValue) => ({
@@ -23,16 +26,25 @@ export function Login() {
     }));
     console.log(user);
   };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="white" />;
+  }
+  if (error) {
+    Alert.alert("Error", error.message);
+  }
+
   const authContext = useContext(AuthContext)
 
   const handelSubmit = async () => {
     try {
-      await login({ variables: user });
+      const {data} = await login({ variables: user });
       // await console.log(data.login.username);
       await SecureStore.setItemAsync("access_token",data.login.access_token)
       await SecureStore.setItemAsync("username",data.login.username)
+      await SecureStore.setItemAsync("userId", String(data.login.userId));
       // console.log(await SecureStore.getItemAsync("access_token"),"aaaaaaaaaaaaaaaa");
-      authContext.signedIn(true)
+      authContext.setSignedIn(true)
     } catch (error) {
       Alert.alert("Error", error.message);
     }

@@ -1,6 +1,5 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://brandonvincentius54321:sX4j5xCL3UFTmxCw@rmt54.wxnng.mongodb.net/?retryWrites=true&w=majority&appName=RMT54";
+const uri = process.env.MONGO_URI;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -10,6 +9,6 @@ const client = new MongoClient(uri, {
   },
 });
 
-const database = client.db("gc01-p3")
+const database = client.db("gc01-p3");
 
-module.exports = {database}
+module.exports = { database };

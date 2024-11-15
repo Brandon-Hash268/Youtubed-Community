@@ -5,8 +5,8 @@ const typeDefsUser = `#graphql
     type FollowUser{
       _id:ID!
       name:String
-      username:String!
-      email:String!
+      username:String
+      email:String
     }
 
     type User{
@@ -21,6 +21,7 @@ const typeDefsUser = `#graphql
     type Token{
         access_token:String!
         username:String
+        userId:ID!
     }
 
     type Query{
@@ -72,7 +73,7 @@ const resolversUser = {
       const { byUserEmail } = await UserAuth.findUser({ email });
       // console.log(byUserEmail);
 
-      return { access_token: access_token,username:byUserEmail.username };
+      return { access_token: access_token, username: byUserEmail.username,userId:byUserEmail._id };
     },
 
     register: async (_, args) => {
