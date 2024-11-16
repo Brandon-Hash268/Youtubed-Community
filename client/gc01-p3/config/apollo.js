@@ -3,7 +3,7 @@ import { setContext } from "@apollo/client/link/context";
 import * as SecureStore from "expo-secure-store";
 
 const httpLink = createHttpLink({
-  uri: "https://ip-p2.brandon-hash268.online/",
+  uri: "https://gc01-p3.brandon-hash268.online/",
 });
 
 const authLink = setContext((_, { headers }) => {

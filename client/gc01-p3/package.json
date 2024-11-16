@@ -24,7 +24,8 @@
     "react-native-screens": "~4.0.0",
     "tamagui": "^1.116.14",
     "expo-image-picker": "~16.0.1",
-    "expo-secure-store": "~14.0.0"
+    "expo-secure-store": "~14.0.0",
+    "expo-updates": "~0.26.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

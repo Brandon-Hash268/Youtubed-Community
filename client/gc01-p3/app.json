@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "gc01-p3",
-    "slug": "gc01-p3",
+    "slug": "gc01-p3-youtube-community",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,10 +28,25 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5d3d1136-594d-4f24-b7a2-21d7fb194abe"
+      }
+    },
+    "owner": "lulzack",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5d3d1136-594d-4f24-b7a2-21d7fb194abe"
     }
   }
 }
